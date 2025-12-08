@@ -1,0 +1,66 @@
+name: Actions Setup Tests
+
+on:
+  pull_request:
+
+jobs:
+  setup-lando-actions-setup-test:
+    runs-on: ${{ matrix.os }}
+    env:
+      LANDO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          # - macos-13
+          # - macos-14
+          - ubuntu-24.04
+          # - windows-2022
+        lando-version:
+          # - '3.14.0'
+          - '3-stable'
+          - '3-edge'
+        node-version:
+          - '20'
+        setup-string:
+          - 1
+          - auto
+          - enabled
+          - on
+          - run
+          - true
+          - 0
+          - false
+          - off
+          - disable
+          - disabled
+          - lando setup
+          - lando setup --skip-common-plugins --plugin @lando/node --orchestrator 2.21.0
+          - lando plugin-add @lando/php && lando setup
+          - mkdir -p test && lando setup
+          # these will fail
+          # - lando.dev something
+          # - oihywpihgklnw
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies and prepare
+        run: |
+          npm clean-install --prefer-offline --frozen-lockfile
+          npm run prepare
+      - name: Setup Lando version
+        uses: ./
+        with:
+          lando-version: ${{ matrix.lando-version }}
+          auto-setup: ${{ matrix.setup-string }}
+          telemetry: false
+          config: |
+            setup.skipCommonPlugins=true
+            setup.plugins.@lando/core=edge

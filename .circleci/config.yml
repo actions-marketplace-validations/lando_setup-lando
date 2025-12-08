@@ -1,0 +1,87 @@
+version: 2.1
+
+jobs:
+  install-on-linux:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run:
+          name: Install Lando on Linux
+          command: |
+            ./setup-lando.sh --no-setup
+            lando version --all
+            lando config
+  setup-on-linux:
+    machine:
+      image: ubuntu-2204:current
+    steps:
+      - checkout
+      - run:
+          name: Setup Lando on Linux
+          command: |
+            ./setup-lando.sh
+            lando version --all
+            lando config
+
+  install-on-macos:
+    macos:
+      xcode: "14.2.0"
+    steps:
+      - checkout
+      - run:
+          name: Install Lando on macOS
+          command: |
+            ./setup-lando.sh --no-setup
+            lando version --all
+            lando config
+  setup-on-macos:
+    macos:
+      xcode: "14.2.0"
+    steps:
+      - checkout
+      - run:
+          name: Setup Lando on macOS
+          command: |
+            ./setup-lando.sh --no-setup
+            lando setup -y --skip-networking
+            lando version --all
+            lando config
+
+  install-on-windows:
+    machine:
+      image: 'windows-server-2022-gui:current'
+    resource_class: windows.medium
+    steps:
+      - checkout
+      - run:
+          name: Install Lando on Windows
+          command: |
+            .\setup-lando.ps1 -NoSetup
+            lando version --all
+            lando config
+          shell: powershell.exe
+  setup-on-windows:
+    machine:
+      image: 'windows-server-2022-gui:current'
+    resource_class: windows.medium
+    steps:
+      - checkout
+      - run:
+          name: Install Lando on Windows
+          command: |
+            .\setup-lando.ps1 -NoSetup
+            lando setup -y --skip-networking
+            lando version --all
+            lando config
+          shell: powershell.exe
+
+workflows:
+  setup-lando:
+    jobs:
+      - install-on-linux
+      - install-on-macos
+      - install-on-windows
+      - setup-on-linux
+      - setup-on-macos
+      - setup-on-windows

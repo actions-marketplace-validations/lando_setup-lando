@@ -32,7 +32,17 @@ build
 .nyc_output
 coverage/
 
-# Vuepress
+# lando
+.lando/id
+
+# docs
 .temp
 .cache
 _site
+cache
+temp
+config.*.timestamp-*-*.*
+docs/.vitepress/dist
+
+# YARN
+yarn.lock

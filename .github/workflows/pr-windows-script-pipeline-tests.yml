@@ -1,0 +1,49 @@
+name: Windows Script Pipeline Tests
+
+on:
+  pull_request:
+
+jobs:
+  setup-lando-windows-pipeline-test:
+    runs-on: windows-2022
+    env:
+      LANDO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      SCRIPT_VERSION: "v3-gha-${{ github.sha }}}"
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - '20'
+        shell:
+          - powershell
+          - pwsh
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+      - name: Install dependencies and prepare
+        run: |
+          npm clean-install --prefer-offline --frozen-lockfile
+          npm run prepare
+      - if: matrix.shell == 'powershell'
+        name: Invoke from pipeline with PowerShell 5.1
+        shell: powershell
+        run: |
+          Invoke-WebRequest "file://${{ github.workspace }}/dist/setup-lando.ps1" | Invoke-Expression
+          Test-Path $env:LOCALAPPDATA\Lando\setup-lando.ps1
+          lando version --all
+
+      - if: matrix.shell == 'pwsh'
+        name: Invoke from pipeline with PowerShell 7
+        shell: pwsh
+        run: |
+          Get-Content "${{ github.workspace }}/dist/setup-lando.ps1" -Raw | Invoke-Expression
+          Test-Path $env:LOCALAPPDATA\Lando\setup-lando.ps1
+          lando version --all
+

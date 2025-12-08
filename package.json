@@ -1,10 +1,10 @@
 {
   "name": "@lando/setup-lando",
   "description": "GitHub Action to setup Lando on GitHub Actions.",
-  "version": "2.0.0-beta.1",
+  "version": "3.7.5",
   "author": "Mike Pirog @pirog",
   "main": "setup-lando.js",
-  "license": "GPL-3.0",
+  "license": "MIT",
   "repository": "https://github.com/lando/setup-lando",
   "bugs": "https://github.com/lando/setup-lando/issues",
   "homepage": "https://github.com/lando/setup-lando",
@@ -13,7 +13,7 @@
     "Github Actions"
   ],
   "engines": {
-    "node": ">=16.0.0"
+    "node": ">=20.0.0"
   },
   "dependencies": {
     "@actions/core": "^1.10.0",
@@ -21,22 +21,34 @@
     "@actions/github": "^5.1.1",
     "@actions/io": "^1.1.3",
     "@actions/tool-cache": "^2.0.1",
-    "@octokit/plugin-paginate-rest": "^6.0.0",
+    "@octokit/plugin-paginate-rest": "^11.4.1",
     "js-yaml": "^4.1.0",
     "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2"
+    "lodash.set": "^4.3.2",
+    "semver": "^7.5.4"
   },
   "devDependencies": {
+    "@actions/http-client": "^2.2.3",
     "@babel/core": "^7.21.5",
     "@babel/eslint-parser": "^7.16.0",
-    "@vercel/ncc": "^0.24.1",
+    "@lando/vitepress-theme-default-plus": "^1.1.1",
+    "@vercel/ncc": "^0.38.1",
     "eslint": "^7.32.0",
-    "eslint-config-google": "^0.14.0",
-    "version-bump-prompt": "^6.1.0"
+    "eslint-config-google": "^0.9.1",
+    "shellcheck": "^2.2.0",
+    "shx": "^0.3.4",
+    "ua-parser-js": "^1.0.37",
+    "vitepress": "^1.4.3"
   },
   "scripts": {
-    "lint": "eslint .",
-    "prepare": "ncc build setup-lando.js -o dist --source-map --license licenses.txt",
-    "release": "yarn prepare && bump --tag --all --push package.json && git tag --force --annotate --message 'moving v2 tag' v2 && git push origin v2 --force"
+    "docs:build": "VPL_MVB_VERSION=$(git describe --tags --always --abbrev=1 --match=\"v[0-9].*\") vitepress build docs",
+    "docs:dev": "VPL_MVB_VERSION=$(git describe --tags --always --abbrev=1 --match=\"v[0-9].*\") vitepress dev docs",
+    "docs:mvb": "npx mvb docs",
+    "docs:preview": "vitepress preview docs",
+    "lint": "eslint . --ext .js --ext .mjs && shellcheck setup-lando.sh",
+    "prepare": "npm run prepare:gha && npm run prepare:scripts && npm run prepare:versions",
+    "prepare:scripts": "shx rm -f ./dist/setup-lando* && shx cp -rf ./setup-lando.* ./dist/",
+    "prepare:gha": "ncc build setup-lando.js -o dist --source-map --license licenses.txt",
+    "prepare:versions": "node versioner.js"
   }
 }

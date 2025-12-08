@@ -1,0 +1,58 @@
+name: Windows Script Version Tests
+
+on:
+  pull_request:
+
+jobs:
+  setup-lando-windows-versions-test:
+    runs-on: windows-2022
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      LANDO_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - version: '3'
+            check: 'v3.*.*'
+          - version: 'v3.21.0-beta.10'
+            check: 'v3.21.0-beta.10'
+          - version: '3-stable'
+            check: 'v3.*.*'
+          - version: '3-edge'
+            check: 'v3.*.*'
+          - version: '3-latest'
+            check: 'v3.*.*'
+          - version: '3-dev'
+            check: 'v3.*.*'
+          - version: 'stable'
+            check: 'v3.*.*'
+          - version: 'edge'
+            check: 'v3.*.*'
+          - version: 'latest'
+            check: 'v3.*.*'
+          - version: 'dev'
+            check: 'v3.*.*-*-*'
+          - version: 'set-with-envvar'
+            check: 'v3.22.0'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Setup Lando version ${{ matrix.version }}
+        shell: powershell
+        run: |
+          # skip command
+          if ("${{ matrix.version }}" -eq "set-with-envvar") {
+            $env:LANDO_VERSION = "v3.22.0"
+            .\setup-lando.ps1 -NoSetup
+          } else {
+            .\setup-lando.ps1 -Version ${{ matrix.version }} -NoSetup
+          }
+
+          if (-not (lando version | Select-String -Pattern "${{ matrix.check }}")) {
+            $reported = lando version
+            throw "Error: lando is not the version we expect! expected ${{ matrix.version}} but found $reported"
+          }

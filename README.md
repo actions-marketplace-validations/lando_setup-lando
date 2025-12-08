@@ -1,98 +1,31 @@
 # Setup Lando
 
-This action installs Lando in GitHub Actions. With it you can:
+This repo is the single source of truth for all things relating to the installation and setup of Lando.
 
-* Install using a version-spec-ish eg `3`, `3.12`, `3.x`, `3.14.0`
-* Install using convenience aliases eg `stable`, `4-latest`, `dev` `3-edge`
-* Set [global Lando config](https://docs.lando.dev/core/global.html) configuration
+This currently includes:
 
-> **NOTE:** If you are using a self-hosted or custom runner you may need to install the needed Lando dependenices eg Docker and Docker Compose for Lando to work correctly!
+* GitHub Actions action
+* Windows setup scripts
+* POSIX setup scripts
+* Install docs
 
-## Inputs
+## Docs
 
-All inputs are optional. If you do nothing the latest `stable` Lando will be installed.
+Check out the below for docs related to your install method.
 
-| Name | Description | Default | Example |
-|---|---|---|---|
-| `lando-version` | The version of Lando to install. If set this has primacy over `lando-version-file`. | `stable` | `3.14.0` |
-| `lando-version-file` | A file that contains the version of Lando to install. | `.lando-version` | `.tool-versions` |
-| `config` | A list of `.` delimited config. If set these have primacy over values in `config-file` | `null` | `engineConfig.port=2376` |
-| `config-file` | The path to a Lando global config file to use. | `null` | `/config/lando-global.yml` |
+* [macOS](https://docs.lando.dev/install/macos.html)
+* [Linux](https://docs.lando.dev/install/linux.html)
+* [Windows](https://docs.lando.dev/install/windows.html)
+* [WSL](https://docs.lando.dev/install/wsl.html)
+* [GitHub Actions](https://docs.lando.dev/install/gha.html)
+* [CircleCI](https://docs.lando.dev/install/circleci.html)
+* [Source](https://docs.lando.dev/install/source.html)
 
-## Outputs
+## Issues, Questions and Support
 
-```yaml
-outputs:
-  lando-path:
-    description: "The path to the installed version of Lando."
-    value: ${{ steps.setup-lando.outputs.lando-path }}
-```
+If you have a question or would like some community support we recommend you [join us on Slack](https://launchpass.com/devwithlando).
 
-##  Usage
-
-### Basic Usage
-
-```yaml
-- name: Setup Lando
-  uses: lando/setup-lando@v2
-```
-
-### Advanced Usage
-
-**Version examples:**
-
-```yaml
-- name: Setup Lando
-  uses: lando/setup-lando@v2
-  with:
-    lando-version: stable | edge | dev | latest | 3 | 3.14.0 | 3.11
-```
-
-
-**Version spec and config file:**
-
-```yaml
-- name: Setup Lando
-  uses: lando/setup-lando@v2
-  with:
-    lando-version: ">2"
-    config-file: config.yaml
-```
-
-**Version file and config list:**
-
-```yaml
-- name: Setup Lando
-  uses: lando/setup-lando@v2
-  with:
-    lando-version-file: .tool-versions
-    config: |
-      core.engine=docker-colima
-      core.telemetry=false
-      plugins.@lando/php=/home/runner/work/php/php
-```
-
-> **NOTE:** The above config is meant purely for illustration.
-
-**Everything, everywhere, all at once:**
-
-```yaml
-- name: Setup Lando
-  uses: lando/setup-lando@v2
-  with:
-    architecture: x64
-    config: |
-      core.engine=docker-colima
-      core.telemetry=false
-      plugins.@lando/php=/home/runner/work/php/php
-    config-file: config.yaml
-    debug: true
-    lando-version: 3.14.0
-    lando-version-file: .tool-versions
-    os: macOS
-    telemetry: false
-    token: ${{ github.token }}
-```
+If you'd like to report a bug or submit a feature request then please [use the issue queue](https://github.com/lando/setup-lando/issues/new/choose) in this repo.
 
 ## Changelog
 
@@ -100,13 +33,12 @@ We try to log all changes big and small in both [THE CHANGELOG](https://github.c
 
 ## Releasing
 
-1. Correctly compile, bump versions, tag things and push to GitHub
+Create a release and publish to [GitHub Actions Marketplace](https://docs.github.com/en/enterprise-cloud@latest/actions/creating-actions/publishing-actions-in-github-marketplace). Note that the release tag must be a [semantic version](https://semver.org/).
 
-  ```bash
-  yarn release
-  ```
+## Maintainers
 
-2. Publish to [GitHub Actions Marketplace](https://docs.github.com/en/enterprise-cloud@latest/actions/creating-actions/publishing-actions-in-github-marketplace)
+* [@pirog](https://github.com/pirog)
+* [@reynoldsalec](https://github.com/reynoldsalec)
 
 ## Contributors
 
@@ -118,4 +50,8 @@ Made with [contrib.rocks](https://contrib.rocks).
 
 ## Other Resources
 
-* [Important advice](https://www.youtube.com/watch?v=WA4iX5D9Z64)
+* [LICENSE](/LICENSE)
+* [TERMS OF USE](https://docs.lando.dev/terms)
+* [PRIVACY POLICY](https://docs.lando.dev/privacy)
+* [CODE OF CONDUCT](https://docs.lando.dev/coc)
+
